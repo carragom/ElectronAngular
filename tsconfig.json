@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": false,
+        "rootDir": "app/",
+        "outDir": "./build"
+    },
+    "exclude": [
+        "node_modules",
+        "app/node_modules",
+        "bower_components"
+    ]
+}

@@ -59,7 +59,7 @@ function updateResources() {
 	});
 	return deferred.promise;
 }
-//Rename the electron exe 
+//Rename the electron exe
 function rename() {
 	return buildDir.renameAsync('electron.exe', manifest.name + '.exe');
 }
@@ -70,7 +70,7 @@ function createInstaller() {
 	function replace(str, patterns) {
 		Object.keys(patterns).forEach(function (pattern) {
 			console.log(pattern)
-			  var matcher = new RegExp('{{' + pattern + '}}', 'g');
+            var matcher = new RegExp('{{' + pattern + '}}', 'g');
 			str = str.replace(matcher, patterns[pattern]);
 		});
 		return str;

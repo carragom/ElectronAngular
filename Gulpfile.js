@@ -9,40 +9,65 @@ var jetpack = require('fs-jetpack');
 var usemin = require('gulp-usemin');
 var uglify = require('gulp-uglify');
 var os = require('os');
-var release_windows = require('./buil.windows');
+var release_windows = require('./windows.build');
+var ts = require('gulp-typescript');
 
 
 var projectDir = jetpack;
 var srcDir = projectDir.cwd('./app');
-var destDir = projectDir.cwd('./build');
+var buildDir = projectDir.cwd('./build');
+var distDir = projectDir.cwd('./dist');
+var tsProject = ts.createProject('tsconfig.json');
 
 // -------------------------------------
 // Tasks
 // -------------------------------------
 
-gulp.task('clean', function (callback) {
-    return destDir.dirAsync('.', { empty: true });
+gulp.task('clean', function () {
+    return Promise.all([
+        buildDir.dirAsync('.', { empty: true }),
+        distDir.dirAsync('.', { empty: true })
+    ]);
 });
 
 gulp.task('copy', ['clean'], function () {
-    return projectDir.copyAsync('app', destDir.path(), {
-        overwrite: true,
-        matching: [
-            './node_modules/**/*',
-            '*.html',
-            '*.css',
-            'main.js',
-            'package.json'
-        ]
-    });
+    return Promise.all([
+        projectDir.copyAsync('app', buildDir.path(), {
+            overwrite: true,
+            matching: [
+                '*.html',
+                '*.css',
+            ]
+        }),
+        projectDir.copyAsync('app', distDir.path(), {
+            overwrite: true,
+            matching: [
+                './node_modules/**/*',
+                '*.html',
+                'main.js',
+                'package.json',
+                '!index.html',
+            ]
+        })
+    ]);
 });
 
-gulp.task('build', ['copy'], function () {
-    return gulp.src('./app/index.html')
+
+gulp.task('transpile', ['copy'], function () {
+    return gulp.src([
+        'typings/tsd.d.ts',
+        'app/**/*.ts'
+    ], { base: 'app' })
+        .pipe(ts(tsProject))
+        .pipe(gulp.dest(buildDir.cwd()));
+});
+
+gulp.task('build', ['transpile'], function () {
+    return gulp.src(buildDir.cwd('./index.html').cwd())
         .pipe(usemin({
             js: [uglify()]
         }))
-        .pipe(gulp.dest('build/'));
+        .pipe(gulp.dest(distDir.cwd()));
 });
 
 
@@ -59,7 +84,7 @@ gulp.task('build-electron', function () {
             //execute build.linux.js
             break;
         case 'win32':
-        console.log('sdf')
+            console.log('sdf')
             return release_windows.build();
     }
 });

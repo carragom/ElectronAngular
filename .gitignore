@@ -1,0 +1,7 @@
+app/node_modules/
+bower_components/
+node_modules/
+build/
+dist/
+typings/
+.vscode/

@@ -1,7 +1,7 @@
-(function () {
+module app {
     'use strict';
     var mysql = require('mysql');
-    
+
     // Creates MySql database connection
     var connection = mysql.createConnection({
         host: "localhost",
@@ -9,10 +9,10 @@
         password: "password",
         database: "customer_manager"
     });
-    
+
     angular.module('app')
         .service('customerService', ['$q', CustomerService]);
-    
+
     function CustomerService($q) {
         return {
             getCustomers: getCustomers,
@@ -22,7 +22,7 @@
             destroy: deleteCustomer,
             update: updateCustomer
         };
-        
+
         function getCustomers() {
             var deferred = $q.defer();
             var query = "SELECT * FROM customers";
@@ -32,7 +32,7 @@
             });
             return deferred.promise;
         }
-        
+
         function getCustomerById(id) {
             var deferred = $q.defer();
             var query = "SELECT * FROM customers WHERE customer_id = ?";
@@ -42,19 +42,19 @@
             });
             return deferred.promise;
         }
-        
+
         function getCustomerByName(name) {
             var deferred = $q.defer();
             var query = "SELECT * FROM customers WHERE name LIKE  '" + name + "%'";
             connection.query(query, [name], function (err, rows) {
                 console.log(err)
                 if (err) deferred.reject(err);
-                
+
                 deferred.resolve(rows);
             });
             return deferred.promise;
         }
-        
+
         function createCustomer(customer) {
             var deferred = $q.defer();
             var query = "INSERT INTO customers SET ?";
@@ -66,7 +66,7 @@
             });
             return deferred.promise;
         }
-        
+
         function deleteCustomer(id) {
             var deferred = $q.defer();
             var query = "DELETE FROM customers WHERE customer_id = ?";
@@ -77,7 +77,7 @@
             });
             return deferred.promise;
         }
-        
+
         function updateCustomer(customer) {
             var deferred = $q.defer();
             var query = "UPDATE customers SET name = ? WHERE customer_id = ?";
@@ -88,4 +88,4 @@
             return deferred.promise;
         }
     }
-})();
+}
